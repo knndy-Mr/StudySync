@@ -135,38 +135,40 @@ class _MyAppState extends State<MyApp> {
         },
         child: Icon(Icons.add),
       ),
-      body: Column(
-        children: [
-          TableCalendar(
-            firstDay: DateTime.utc(2010, 10, 16),
-            lastDay: DateTime.utc(2030, 3, 14),
-            focusedDay: _focusedDay,
-            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-            calendarFormat: _calendarFormat,
-            onDaySelected: _onDaySelected,
-            eventLoader: _getEventsForDay,
-            calendarStyle: CalendarStyle(
-              outsideDaysVisible: false,
-            ),
-            onFormatChanged: (format) {
-              if (_calendarFormat != format) {
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            TableCalendar(
+              firstDay: DateTime.utc(2010, 10, 16),
+              lastDay: DateTime.utc(2030, 3, 14),
+              focusedDay: _focusedDay,
+              selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+              calendarFormat: _calendarFormat,
+              onDaySelected: _onDaySelected,
+              eventLoader: _getEventsForDay,
+              calendarStyle: CalendarStyle(
+                outsideDaysVisible: false,
+              ),
+              onFormatChanged: (format) {
+                if (_calendarFormat != format) {
+                  setState(() {
+                    _calendarFormat = format;
+                  });
+                }
+              },
+              onPageChanged: (focusedDay) {
                 setState(() {
-                  _calendarFormat = format;
+                  _focusedDay = focusedDay;
                 });
-              }
-            },
-            onPageChanged: (focusedDay) {
-              setState(() {
-                _focusedDay = focusedDay;
-              });
-            },
-          ),
-          SizedBox(height: 8.0),
-          Expanded(
-            child: ValueListenableBuilder(
+              },
+            ),
+            SizedBox(height: 8.0),
+            ValueListenableBuilder(
               valueListenable: _selectedEvents,
               builder: (context, value, _) {
                 return ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
                   itemCount: value.length,
                   itemBuilder: (context, index) {
                     final assignment = value[index];
@@ -188,8 +190,8 @@ class _MyAppState extends State<MyApp> {
                 );
               },
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
