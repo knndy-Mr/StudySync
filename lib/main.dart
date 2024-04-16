@@ -86,6 +86,22 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
+  BoxDecoration _getSelectedDayDecoration(DateTime day) {
+    if (_selectedDay != null && isSameDay(day, _selectedDay!)) {
+      return BoxDecoration(
+        color: Colors.red,
+        shape: BoxShape.circle,
+      );
+    } else if (isSameDay(day, DateTime.now())) {
+      return BoxDecoration(
+        color: Colors.red.withOpacity(0.5), // Opaque for today when not selected
+        shape: BoxShape.circle,
+      );
+    } else {
+      return BoxDecoration(); // No decoration for other days
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -148,6 +164,8 @@ class _MyAppState extends State<MyApp> {
               eventLoader: _getEventsForDay,
               calendarStyle: CalendarStyle(
                 outsideDaysVisible: false,
+                selectedDecoration: _getSelectedDayDecoration(_focusedDay),
+                todayDecoration: _getSelectedDayDecoration(DateTime.now()),
               ),
               onFormatChanged: (format) {
                 if (_calendarFormat != format) {
@@ -172,17 +190,23 @@ class _MyAppState extends State<MyApp> {
                   itemCount: value.length,
                   itemBuilder: (context, index) {
                     final assignment = value[index];
-                    return GestureDetector(
-                      onDoubleTap: () => _showDeleteConfirmationDialog(assignment),
-                      child: Container(
-                        margin: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                        decoration: BoxDecoration(
-                          border: Border.all(),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: ListTile(
-                          onTap: () => print(""),
-                          title: Text(assignment.title),
+                    return Container(
+                      margin: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      decoration: BoxDecoration(
+                        border: Border.all(),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: ListTile(
+                        title: Row(
+                          children: [
+                            Expanded(
+                              child: Text(assignment.title),
+                            ),
+                            IconButton(
+                              onPressed: () => _showDeleteConfirmationDialog(assignment),
+                              icon: Icon(Icons.delete, color: Colors.red),
+                            ),
+                          ],
                         ),
                       ),
                     );
